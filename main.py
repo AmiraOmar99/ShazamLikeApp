@@ -13,7 +13,8 @@ logging.basicConfig(filename="logging.log", format='%(asctime)s %(message)s',fil
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
 
-os.mkdir('temp') 
+
+
 
 class MainWindow(QtWidgets.QMainWindow, Shazam.Ui_MainWindow):
     def __init__(self):
@@ -31,7 +32,11 @@ class MainWindow(QtWidgets.QMainWindow, Shazam.Ui_MainWindow):
     def open(self,index):
         logger.debug('open song {}'.format(index+1))
         song_path = PyQt5.QtWidgets.QFileDialog.getOpenFileName(None, 'open song', None, "MP3 *.mp3;; WAV *.wav")[0]
-        self.songs[index]=Song()
+        if song_path:
+            self.songs[index]=Song(song_path)
+            self.songs[index].gen_spectrogram()
+            self.songs[index].get_features()
+            print(len(self.songs[index].features)) 
 
 
 if __name__ == "__main__":

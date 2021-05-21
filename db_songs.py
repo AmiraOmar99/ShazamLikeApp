@@ -1,4 +1,6 @@
 import os
+import io 
+import json
 import numpy as np
 import matplotlib.mlab as mlab
 import matplotlib.pyplot as plt
@@ -8,6 +10,9 @@ from pydub import AudioSegment
 from scipy.ndimage.filters import maximum_filter
 from scipy.ndimage.morphology import (generate_binary_structure, iterate_structure, binary_erosion)
 
+import imagehash
+from PIL import Image
+
 curr_dir = os.getcwd()
 
 
@@ -16,13 +21,15 @@ class Song():
         self.path=path
         self.data = None
         self.sr = None
-        self.hop_length = 2048 #50% overlap
-        self.window_size = 4096
-        self.mel_spectrogram =None
-        self.mfcc = None
-        self.chroma_stft = None
-        self.onset_frames= None
-        self.peaks=None
+        self.hop_length = 512 #50% overlap
+        self.window_size = 1024
+        # self.mel_spectrogram =None
+        # self.mfcc = None
+        # self.chroma_stft = None
+        # self.o_env=None
+        # self.onset_frames= None
+        # self.spectral_centroids=None
+        self.features={"mel_spectrogram": None, "mfcc":None,"chroma_stft":None,"onset_frames":None }
         self.read_song()
         
         
@@ -36,29 +43,26 @@ class Song():
             sound.export("converted.wav", format="wav")
             path = "./converted.wav"
 
-        self.data, self.sr = librosa.core.load(path, mono=True, duration=60)
-        pass
+        self.data, self.sr = librosa.core.load(self.path, mono=True, duration=60)
 
     def gen_spectrogram(self):
         S = librosa.feature.melspectrogram(self.data, sr=self.sr, n_fft=self.window_size, hop_length=self.hop_length, n_mels=128)
-        self.mel_spectrogram = librosa.power_to_db(S, ref=np.max)
+        self.features["mel_spectrogram"] = librosa.power_to_db(S, ref=np.max)
 
 
     def save_spectrogram(self,path):
         fig = plt.Figure()       
         ax = fig.add_subplot(111)
-        librosa.display.specshow(self.mel_spectrogram, sr=self.sr, hop_length=self.hop_length, x_axis='time', y_axis='mel')
+        librosa.display.specshow(self.features["mel_spectrogram"], sr=self.sr, hop_length=self.hop_length, x_axis='time', y_axis='mel')
         plt.savefig(path+os.path.split(self.name)[1])
  
-    def features(self):
-        self.mfcc = librosa.feature.mfcc(y=self.data.astype('float64'), sr=self.sr)
-        self.chroma_stft =librosa.feature.chroma_stft(y= self.data, sr=self.sr)
-        #self.tempogram=librosa.feature.tempogram()
+    def get_features(self):
+        self.features["mfcc"] = librosa.feature.mfcc(y=self.data.astype('float64'),  n_mfcc=20, sr=self.sr).tolist()
+        self.features["chroma_stft"] =librosa.feature.chroma_stft(y= self.data, sr=self.sr).tolist()
         o_env = librosa.onset.onset_strength(self.data, sr=self.sr)
-        #times = librosa.times_like(o_env, sr=self.sr)
-        self.onset_frames = librosa.onset.onset_detect(onset_envelope=o_env, sr=self.sr)
-        #self.peaks=librosa.util.peak_pick(x, pre_max, post_max, pre_avg, post_avg, delta, wait)
-        #self.get_peaks()
+        self.features["onset_frames"] = librosa.onset.onset_detect(onset_envelope=o_env, sr=self.sr).tolist()
+        self.features["mel_spectrogram"] =self.features["mel_spectrogram"] .tolist()
+
 
         
     def get_peaks(self):
@@ -88,15 +92,22 @@ class Song():
 
 
 
-
+def write_json(PATH,dict):
+    with io.open(PATH, 'w') as db_file:
+        json.dump(dict,db_file)
 
 
 
 if __name__ == "__main__":
+    
     for filename in os.listdir(".\Database\Songs"):
+        file={}
         song_path= os.path.join(curr_dir+"\Database\Songs", filename)
-        #print(song_path)
         song = Song(song_path)
         song.gen_spectrogram()
         song.save_spectrogram(".\Database\spectrograms/")
-        song.features()
+        song.get_features()
+        file.update({filename: song.features})
+        write_json("./Database/features/"+filename+".json", file)
+
+
