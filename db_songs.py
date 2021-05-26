@@ -9,12 +9,15 @@ from librosa.core import load
 from pydub import AudioSegment
 from scipy.ndimage.filters import maximum_filter
 from scipy.ndimage.morphology import (generate_binary_structure, iterate_structure, binary_erosion)
-
+import logging
 import imagehash
 from PIL import Image
 
-curr_dir = os.getcwd()
 
+
+logger = logging.getLogger()
+
+curr_dir = os.getcwd()
 
 class Song():
     def __init__(self,path= ""):
@@ -30,11 +33,9 @@ class Song():
         # self.onset_frames= None
         # self.spectral_centroids=None
         self.features={"mel_spectrogram": None, "mfcc":None,"chroma_stft":None,"onset_frames":None }
+        self.hashed_features= {"mel_spectrogram": None, "mfcc":None,"chroma_stft":None,"onset_frames":None }
         self.read_song()
         
-        
-   
-
     def read_song(self):
         self.name, ext = os.path.splitext(self.path)
         
@@ -49,7 +50,6 @@ class Song():
         S = librosa.feature.melspectrogram(self.data, sr=self.sr, n_fft=self.window_size, hop_length=self.hop_length, n_mels=128)
         self.features["mel_spectrogram"] = librosa.power_to_db(S, ref=np.max)
 
-
     def save_spectrogram(self,path):
         fig = plt.Figure()       
         ax = fig.add_subplot(111)
@@ -61,15 +61,13 @@ class Song():
         self.features["chroma_stft"] =librosa.feature.chroma_stft(y= self.data, sr=self.sr).tolist()
         o_env = librosa.onset.onset_strength(self.data, sr=self.sr)
         self.features["onset_frames"] = librosa.onset.onset_detect(onset_envelope=o_env, sr=self.sr).tolist()
-        self.features["mel_spectrogram"] =self.features["mel_spectrogram"] .tolist()
+        self.features["mel_spectrogram"] =self.features["mel_spectrogram"].tolist()
 
-
-        
     def get_peaks(self):
         struct = generate_binary_structure(2, 1)
         neighborhood = iterate_structure(struct,10)
         local_max = maximum_filter(self.mel_spectrogram, footprint=neighborhood) == self.mel_spectrogram
-        background = (self.mel_spectrogram== 0)
+        background = (self.mel_spectrogram == 0)
         eroded_background = binary_erosion(background, structure=neighborhood)
         
         #applying XOR between the matrices to get the boolean mask of spectrogram
@@ -89,23 +87,31 @@ class Song():
 
         #print(len(list(zip(self.peaks))))
 
+    def createPerceptualHash(self, feature):
+        logger.debug("Creating Perceptual Hash for each feature")
+        dataInstance = Image.fromarray(feature)
+        hashed_data = imagehash.phash(dataInstance, hash_size=16)
+        print(hashed_data)
+        return hashed_data
 
-
-
-def write_json(PATH,dict):
-    with io.open(PATH, 'w') as db_file:
-        json.dump(dict,db_file)
+    def getHashedData(self, Hdic , Fdic):
+        for key in Hdic:
+            Hdic[key]=self.createPerceptualHash(np.array(Fdic[key]))
+    
+    def write_json(PATH,dict):
+        with io.open(PATH, 'w') as db_file:
+            json.dump(dict,db_file)
 
 
 
 if __name__ == "__main__":
     
-    for filename in os.listdir(".\Database\Songs"):
+    for filename in os.listdir("./Database/Songs"):
         file={}
-        song_path= os.path.join(curr_dir+"\Database\Songs", filename)
+        song_path= os.path.join(curr_dir+"/Database/Songs", filename)
         song = Song(song_path)
         song.gen_spectrogram()
-        song.save_spectrogram(".\Database\spectrograms/")
+        song.save_spectrogram("./Database/spectrograms/")
         song.get_features()
         file.update({filename: song.features})
         write_json("./Database/features/"+filename+".json", file)

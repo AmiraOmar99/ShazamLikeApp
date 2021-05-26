@@ -165,7 +165,7 @@ class Ui_MainWindow(object):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
         self.label_6.setText(_translate("MainWindow", "<html><head/><body><p><span style=\" font-size:11pt; font-weight:600;\">Choose song1 percentage</span></p></body></html>"))
-        self.slider_percentage.setText(_translate("MainWindow", "%"))
+        self.slider_percentage.setText(_translate("MainWindow",""))
         self.label.setText(_translate("MainWindow", "<html><head/><body><p><span style=\" font-size:14pt; font-weight:600;\">Browse</span></p></body></html>"))
         self.label_2.setText(_translate("MainWindow", "<html><head/><body><p><span style=\" font-size:14pt; font-weight:600;\">Mix</span></p></body></html>"))
         self.open_song1.setText(_translate("MainWindow", "Song1"))
