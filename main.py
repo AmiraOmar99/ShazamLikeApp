@@ -47,14 +47,13 @@ class MainWindow(QtWidgets.QMainWindow, Shazam_ui.Ui_MainWindow):
             # self.songs[index].hashed_features["onset_frames"]=self.createPerceptualHash(np.array(self.songs[index].features["onset_frames"]))
 
             #print(len(self.songs[index].features))
-            #print(len(self.songs[index].hashed_features))
+            print(self.songs[index].hashed_features)
 
         for song in self.songs:
             name=song_path.split("/")[-1]
             self.song_labels[index].setText(name)
         #print(len(self.songs[index].data))
         self.mix()
-
 
     def mixSongs(self,song1, song2, ratio):
         logger.debug("Mixing the 2 songs together with {} % of song1".format(ratio*100) + " and {} % of song2".format((1-ratio)*100) )  
@@ -71,6 +70,7 @@ class MainWindow(QtWidgets.QMainWindow, Shazam_ui.Ui_MainWindow):
                 self.mixFile.gen_spectrogram()
                 self.mixFile.get_features()
                 self.mixFile.getHashedData(self.mixFile.hashed_features,self.mixFile.features )
+                print(self.mixFile.hashed_features)
 
                 # self.mixFile.hashed_features["mel_spectrogram"]=self.createPerceptualHash(np.array(self.mixFile.features["mel_spectrogram"]))
                 # self.mixFile.hashed_features["mfcc"]=self.createPerceptualHash(np.array(self.mixFile.features["mfcc"]))
@@ -79,6 +79,7 @@ class MainWindow(QtWidgets.QMainWindow, Shazam_ui.Ui_MainWindow):
 
                 #print(len(self.mixFile.features))
                 #print(len(self.songMix.data))
+
                 logger.debug("Mixing Output") 
             else:
                 self.slider.setDisabled(True)
@@ -92,7 +93,7 @@ class MainWindow(QtWidgets.QMainWindow, Shazam_ui.Ui_MainWindow):
 
     # def getHashedData(self, Hdic , Fdic):
     #     for key in Hdic:
-    #         Hdic[key]=self.createPerceptualHash(np.array(Fdic[key]))
+    #         Hdic[key].append=self.createPerceptualHash(np.array(Fdic[key]))
 
          
 if __name__ == "__main__":
