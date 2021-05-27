@@ -32,7 +32,6 @@ class MainWindow(QtWidgets.QMainWindow, Shazam_ui.Ui_MainWindow):
         self.open_song2.clicked.connect(lambda: self.open(1))
         self.slider.valueChanged.connect(lambda: self.mix())
 
-
     def open(self,index):
         logger.debug('open song {}'.format(index+1))
         song_path = PyQt5.QtWidgets.QFileDialog.getOpenFileName(None, 'open song', None, "MP3 *.mp3;; WAV *.wav")[0]

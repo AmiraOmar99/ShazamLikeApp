@@ -91,18 +91,16 @@ class Song():
         logger.debug("Creating Perceptual Hash for each feature")
         dataInstance = Image.fromarray(feature)
         hashed_data = imagehash.phash(dataInstance, hash_size=16).__str__()
-        print(type(hashed_data))
+        #print(type(hashed_data))
         return hashed_data
 
     def getHashedData(self, Hdic , Fdic):
         for key in Hdic:
             Hdic[key]=self.createPerceptualHash(np.array(Fdic[key]))
     
-    def write_json(PATH,dict):
+    def write_json(self, PATH,dict):
         with io.open(PATH, 'w') as db_file:
             json.dump(dict,db_file)
-
-
 
 if __name__ == "__main__":
     
@@ -113,9 +111,9 @@ if __name__ == "__main__":
         song.gen_spectrogram()
         song.save_spectrogram("./Database/spectrograms/")
         song.get_features()
-        song.getHashedData()
+        song.getHashedData(song.hashed_features, song.features)
         file.update({filename: song.features})
         file.update({filename: song.hashed_features})
-        write_json("./Database/features/"+filename+".json", file)
+        song.write_json("./Database/features/"+filename+".json", file)
 
 
