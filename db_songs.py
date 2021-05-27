@@ -63,29 +63,29 @@ class Song():
         self.features["onset_frames"] = librosa.onset.onset_detect(onset_envelope=o_env, sr=self.sr).tolist()
         self.features["mel_spectrogram"] =self.features["mel_spectrogram"].tolist()
 
-    def get_peaks(self):
-        struct = generate_binary_structure(2, 1)
-        neighborhood = iterate_structure(struct,10)
-        local_max = maximum_filter(self.mel_spectrogram, footprint=neighborhood) == self.mel_spectrogram
-        background = (self.mel_spectrogram == 0)
-        eroded_background = binary_erosion(background, structure=neighborhood)
+    # def get_peaks(self):
+    #     struct = generate_binary_structure(2, 1)
+    #     neighborhood = iterate_structure(struct,10)
+    #     local_max = maximum_filter(self.mel_spectrogram, footprint=neighborhood) == self.mel_spectrogram
+    #     background = (self.mel_spectrogram == 0)
+    #     eroded_background = binary_erosion(background, structure=neighborhood)
         
-        #applying XOR between the matrices to get the boolean mask of spectrogram
-        detected_peaks = local_max ^ eroded_background
+    #     #applying XOR between the matrices to get the boolean mask of spectrogram
+    #     detected_peaks = local_max ^ eroded_background
         
-        # extract peaks
-        amps = self.mel_spectrogram[detected_peaks].flatten()
-        peak_freqs , peak_times = np.where(detected_peaks)
+    #     # extract peaks
+    #     amps = self.mel_spectrogram[detected_peaks].flatten()
+    #     peak_freqs , peak_times = np.where(detected_peaks)
         
-        filtered_peaks = np.where(abs(amps) > 10)  # freq, time, amp
+    #     filtered_peaks = np.where(abs(amps) > 10)  # freq, time, amp
         
-        #get freqs , times of the indicies
-        freqs=peak_freqs[filtered_peaks]
-        times=peak_times[filtered_peaks]
+    #     #get freqs , times of the indicies
+    #     freqs=peak_freqs[filtered_peaks]
+    #     times=peak_times[filtered_peaks]
         
-        self.peaks = list(zip(freqs, times))
+    #     self.peaks = list(zip(freqs, times))
 
-        #print(len(list(zip(self.peaks))))
+    #     #print(len(list(zip(self.peaks))))
 
     def createPerceptualHash(self, feature) -> str:
         logger.debug("Creating Perceptual Hash for each feature")
@@ -103,17 +103,18 @@ class Song():
             json.dump(dict,db_file)
 
 if __name__ == "__main__":
-    
+    file_hash = {}
     for filename in os.listdir("./Database/Songs"):
-        file={}
+        #file={}
         song_path= os.path.join(curr_dir+"/Database/Songs", filename)
         song = Song(song_path)
         song.gen_spectrogram()
-        song.save_spectrogram("./Database/spectrograms/")
+        #song.save_spectrogram("./Database/spectrograms/")
         song.get_features()
+        #file.update({filename: song.features})
+        #write_json("./Database/feautures"+filename+".json", file_hash)
         song.getHashedData(song.hashed_features, song.features)
-        file.update({filename: song.features})
-        file.update({filename: song.hashed_features})
-        song.write_json("./Database/features/"+filename+".json", file)
+        file_hash.update({filename: song.hashed_features})
+        song.write_json("./Database/hash"+".json", file_hash)
 
 
