@@ -98,7 +98,7 @@ class Song():
         for key in Hdic:
             Hdic[key]=self.createPerceptualHash(np.array(Fdic[key]))
     
-    def write_json(PATH,dict):
+    def write_json(self, PATH, dict):
         with io.open(PATH, 'w') as db_file:
             json.dump(dict,db_file)
 
@@ -114,6 +114,6 @@ if __name__ == "__main__":
         song.save_spectrogram("./Database/spectrograms/")
         song.get_features()
         file.update({filename: song.features})
-        write_json("./Database/features/"+filename+".json", file)
+        song.write_json("./Database/features/"+filename+".json", file)
 
 

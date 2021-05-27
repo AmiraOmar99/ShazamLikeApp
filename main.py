@@ -48,6 +48,7 @@ class MainWindow(QtWidgets.QMainWindow, Shazam_ui.Ui_MainWindow):
 
             #print(len(self.songs[index].features))
             #print(len(self.songs[index].hashed_features))
+            print(self.songs[index].hashed_features[0])
 
         for song in self.songs:
             name=song_path.split("/")[-1]
