@@ -98,18 +98,31 @@ class MainWindow(QtWidgets.QMainWindow, Shazam_ui.Ui_MainWindow):
             msg.setIcon(PyQt5.QtWidgets.QMessageBox.Critical)
             msg.exec_()
 
+    # def compare_songs(self, mysong):
+    #     self.similarity_indices = {}
+    #     logger.debug("Comparing song with the database songs")
+    #     for filename in os.listdir("./Database/features"):
+    #         file = open("./Database/features/"+filename,)
+    #         data = json.load(file)
+    #         features = data[filename[:-4]+"mp3"]
+    #         self.similarity_indices[filename[:-5]] = mysong.get_similarity_index(features)
+    #         file.close()
+    #     self.similarity_indices = dict(sorted(self.similarity_indices.items(), key=lambda item: item[1] , reverse=True))
+    #     # print(self.similarity_indices)
+    #     self.show_results() 
+
     def compare_songs(self, mysong):
         self.similarity_indices = {}
         logger.debug("Comparing song with the database songs")
-        for filename in os.listdir("./Database/features"):
-            file = open("./Database/features/"+filename,)
-            data = json.load(file)
-            features = data[filename[:-4]+"mp3"]
-            self.similarity_indices[filename[:-5]] = mysong.get_similarity_index(features)
-            file.close()
+        file = open("./Database/hash.json",)
+        data = json.load(file)
+        for song in data:
+            self.similarity_indices[song[:-4]] = mysong.get_similarity_index(data[song])
+        file.close()
         self.similarity_indices = dict(sorted(self.similarity_indices.items(), key=lambda item: item[1] , reverse=True))
         # print(self.similarity_indices)
         self.show_results() 
+
 
     def show_results(self):
         self.resultsTable.setColumnCount(2)
