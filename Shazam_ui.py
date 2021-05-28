@@ -146,6 +146,17 @@ class Ui_MainWindow(object):
         self.Recognize.setObjectName("Recognize")
         self.verticalLayout_8.addWidget(self.Recognize)
         self.gridLayout_2.addWidget(self.frame_8, 2, 1, 1, 1)
+        self.frame_10 = QtWidgets.QFrame(self.frame)
+        self.frame_10.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.frame_10.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.frame_10.setObjectName("frame_10")
+        self.verticalLayout_10 = QtWidgets.QVBoxLayout(self.frame_10)
+        self.verticalLayout_10.setObjectName("verticalLayout_10")
+        self.Recognize_2 = QtWidgets.QPushButton(self.frame_10)
+        self.Recognize_2.setMaximumSize(QtCore.QSize(300, 100))
+        self.Recognize_2.setObjectName("Recognize_2")
+        self.verticalLayout_10.addWidget(self.Recognize_2)
+        self.gridLayout_2.addWidget(self.frame_10, 2, 2, 1, 1)
         self.verticalLayout_2.addWidget(self.frame)
         self.scrollArea.setWidget(self.scrollAreaWidgetContents)
         self.verticalLayout.addWidget(self.scrollArea)
@@ -171,7 +182,8 @@ class Ui_MainWindow(object):
         self.open_song1.setText(_translate("MainWindow", "Song1"))
         self.open_song2.setText(_translate("MainWindow", "Song2"))
         self.label_3.setText(_translate("MainWindow", "<html><head/><body><p><span style=\" font-size:14pt; font-weight:600;\">Result</span></p></body></html>"))
-        self.Recognize.setText(_translate("MainWindow", "Recognize"))
+        self.Recognize.setText(_translate("MainWindow", "Recognize Song 1"))
+        self.Recognize_2.setText(_translate("MainWindow", "Recognize Song 2"))
 
 
 if __name__ == "__main__":

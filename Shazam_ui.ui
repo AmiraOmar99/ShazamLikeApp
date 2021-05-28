@@ -25,8 +25,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>931</width>
-         <height>632</height>
+         <width>935</width>
+         <height>646</height>
         </rect>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -287,7 +287,32 @@
                  </size>
                 </property>
                 <property name="text">
-                 <string>Recognize</string>
+                 <string>Recognize Song 1</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item row="2" column="2">
+            <widget class="QFrame" name="frame_10">
+             <property name="frameShape">
+              <enum>QFrame::StyledPanel</enum>
+             </property>
+             <property name="frameShadow">
+              <enum>QFrame::Raised</enum>
+             </property>
+             <layout class="QVBoxLayout" name="verticalLayout_10">
+              <item>
+               <widget class="QPushButton" name="Recognize_2">
+                <property name="maximumSize">
+                 <size>
+                  <width>300</width>
+                  <height>100</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>Recognize Song 2</string>
                 </property>
                </widget>
               </item>
@@ -309,7 +334,7 @@
      <x>0</x>
      <y>0</y>
      <width>955</width>
-     <height>26</height>
+     <height>21</height>
     </rect>
    </property>
   </widget>

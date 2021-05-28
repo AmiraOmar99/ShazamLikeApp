@@ -12,6 +12,8 @@ from scipy.ndimage.morphology import (generate_binary_structure, iterate_structu
 import logging
 import imagehash
 from PIL import Image
+import difflib
+
 
 
 
@@ -91,7 +93,7 @@ class Song():
         logger.debug("Creating Perceptual Hash for each feature")
         dataInstance = Image.fromarray(feature)
         hashed_data = imagehash.phash(dataInstance, hash_size=16).__str__()
-        print(type(hashed_data))
+        # print(type(hashed_data))
         return hashed_data
 
     def getHashedData(self, Hdic , Fdic):
@@ -102,7 +104,19 @@ class Song():
         with io.open(PATH, 'w') as db_file:
             json.dump(dict,db_file)
 
-
+    # gets the similarity index between this song and another song features
+    def get_similarity_index(self, compared_features):
+        sim_index = []
+        for hash in compared_features:
+            sim_index.append(difflib.SequenceMatcher(None, self.hashed_features[hash], compared_features[hash]).ratio())
+        # avg = 0 
+        # sum = 0 
+        # for i in sim_index:
+        #     sum += i
+        # avg = sum / len(sim_index) 
+        sum = sim_index[1] + sim_index[2]
+        avg = sum / 2
+        return avg * 100
 
 if __name__ == "__main__":
     
@@ -113,13 +127,9 @@ if __name__ == "__main__":
         song.gen_spectrogram()
         song.save_spectrogram("./Database/spectrograms/")
         song.get_features()
-        song.getHashedData()
+        song.getHashedData(song.hashed_features, song.features)
         file.update({filename: song.features})
-<<<<<<< HEAD
-        song.write_json("./Database/features/"+filename+".json", file)
-=======
         file.update({filename: song.hashed_features})
-        write_json("./Database/features/"+filename+".json", file)
->>>>>>> 056c5efd406d02b031b3533917ba4ecfee7ad129
+        song.write_json("./Database/features/"+filename[:-4]+".json", file)
 
 

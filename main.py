@@ -9,6 +9,9 @@ import sys
 import os
 import scipy.io.wavfile as wavf
 import logging
+import json
+
+
 
 #Create and configure logger
 logging.basicConfig(filename="logging.log", format='%(asctime)s %(message)s',filemode='w')
@@ -31,7 +34,8 @@ class MainWindow(QtWidgets.QMainWindow, Shazam_ui.Ui_MainWindow):
         self.open_song1.clicked.connect(lambda: self.open(0))
         self.open_song2.clicked.connect(lambda: self.open(1))
         self.slider.valueChanged.connect(lambda: self.mix())
-
+        self.Recognize.clicked.connect(lambda: self.check_opened(0))
+        self.Recognize_2.clicked.connect(lambda: self.check_opened(1))
 
     def open(self,index):
         logger.debug('open song {}'.format(index+1))
@@ -47,12 +51,7 @@ class MainWindow(QtWidgets.QMainWindow, Shazam_ui.Ui_MainWindow):
             # self.songs[index].hashed_features["onset_frames"]=self.createPerceptualHash(np.array(self.songs[index].features["onset_frames"]))
 
             #print(len(self.songs[index].features))
-<<<<<<< HEAD
-            #print(len(self.songs[index].hashed_features))
-            print(self.songs[index].hashed_features[0])
-=======
-            print(self.songs[index].hashed_features)
->>>>>>> 056c5efd406d02b031b3533917ba4ecfee7ad129
+            # print(self.songs[index].hashed_features)
 
         for song in self.songs:
             name=song_path.split("/")[-1]
@@ -75,8 +74,8 @@ class MainWindow(QtWidgets.QMainWindow, Shazam_ui.Ui_MainWindow):
                 self.mixFile.gen_spectrogram()
                 self.mixFile.get_features()
                 self.mixFile.getHashedData(self.mixFile.hashed_features,self.mixFile.features )
-                print(self.mixFile.hashed_features)
-
+                # print(self.mixFile.hashed_features)
+                self.compare_songs(self.mixFile)
                 # self.mixFile.hashed_features["mel_spectrogram"]=self.createPerceptualHash(np.array(self.mixFile.features["mel_spectrogram"]))
                 # self.mixFile.hashed_features["mfcc"]=self.createPerceptualHash(np.array(self.mixFile.features["mfcc"]))
                 # self.mixFile.hashed_features["chroma_stft"]=self.createPerceptualHash(np.array(self.mixFile.features["chroma_stft"]))
@@ -88,6 +87,45 @@ class MainWindow(QtWidgets.QMainWindow, Shazam_ui.Ui_MainWindow):
                 logger.debug("Mixing Output") 
             else:
                 self.slider.setDisabled(True)
+
+    def check_opened(self,index):
+        if(self.songs[index]):
+            self.compare_songs(self.songs[index])
+        else:
+            msg = PyQt5.QtWidgets.QMessageBox()
+            msg.setWindowTitle('ERROR')
+            msg.setText('Error: please select a song to recognize.')
+            msg.setIcon(PyQt5.QtWidgets.QMessageBox.Critical)
+            msg.exec_()
+
+    def compare_songs(self, mysong):
+        self.similarity_indices = {}
+        logger.debug("Comparing song with the database songs")
+        for filename in os.listdir("./Database/features"):
+            file = open("./Database/features/"+filename,)
+            data = json.load(file)
+            features = data[filename[:-4]+"mp3"]
+            self.similarity_indices[filename[:-5]] = mysong.get_similarity_index(features)
+            file.close()
+        self.similarity_indices = dict(sorted(self.similarity_indices.items(), key=lambda item: item[1] , reverse=True))
+        # print(self.similarity_indices)
+        self.show_results() 
+
+    def show_results(self):
+        self.resultsTable.setColumnCount(2)
+        self.resultsTable.setRowCount(len(self.similarity_indices))
+        for index, key in enumerate(self.similarity_indices):
+            self.resultsTable.setItem(index, 0, QtWidgets.QTableWidgetItem(key))
+            self.resultsTable.setItem(index, 1, QtWidgets.QTableWidgetItem(str(round(self.similarity_indices[key], 2))+"%"))
+            self.resultsTable.verticalHeader().setSectionResizeMode(index, QtWidgets.QHeaderView.Stretch)
+
+        self.resultsTable.setHorizontalHeaderLabels(["Song Matches", "Similarity %"])
+
+        for col in range(2):
+            self.resultsTable.horizontalHeader().setSectionResizeMode(col, QtWidgets.QHeaderView.Stretch)
+
+        self.resultsTable.show()    
+
 
     # def createPerceptualHash(self, feature):
     #     logger.debug("Creating Perceptual Hash for each feature")
