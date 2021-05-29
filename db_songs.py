@@ -64,7 +64,6 @@ class Song():
         self.features["spectral_contrast"]= librosa.feature.spectral_contrast(y=self.data, sr=self.sr).tolist()
         self.features["mel_spectrogram"] =self.features["mel_spectrogram"].tolist()
 
-    
     def createPerceptualHash(self, feature) -> str:
         logger.debug("Creating Perceptual Hash for each feature")
         dataInstance = Image.fromarray(feature)
@@ -91,7 +90,7 @@ class Song():
         #     sum += i
         # avg = sum / len(sim_index) 
         sum = 1.5*sim_index[0] + 1.5*sim_index[1] +  1.5*sim_index[2] + sim_index[3]
-        avg = sum /5
+        avg = sum /5.5
         return avg * 100
 
 if __name__ == "__main__":

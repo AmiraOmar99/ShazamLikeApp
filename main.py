@@ -11,8 +11,6 @@ import scipy.io.wavfile as wavf
 import logging
 import json
 
-
-
 #Create and configure logger
 logging.basicConfig(filename="logging.log", format='%(asctime)s %(message)s',filemode='w')
 
@@ -50,8 +48,9 @@ class MainWindow(QtWidgets.QMainWindow, Shazam_ui.Ui_MainWindow):
             # self.songs[index].hashed_features["chroma_stft"]=self.createPerceptualHash(np.array(self.songs[index].features["chroma_stft"]))
             # self.songs[index].hashed_features["onset_frames"]=self.createPerceptualHash(np.array(self.songs[index].features["onset_frames"]))
 
-            #print(len(self.songs[index].features))
-            # print(self.songs[index].hashed_features)
+            print(self.songs[index].features["mel_spectrogram"][0][0:30])
+            print(self.songs[index].hashed_features["mel_spectrogram"])
+            print(self.songs[index].hashed_features["mfcc"])
 
         for song in self.songs:
             name=song_path.split("/")[-1]
@@ -119,7 +118,7 @@ class MainWindow(QtWidgets.QMainWindow, Shazam_ui.Ui_MainWindow):
         for song in data:
             self.similarity_indices[song[:-4]] = mysong.get_similarity_index(data[song])
         file.close()
-        self.similarity_indices = dict(sorted(self.similarity_indices.items(), key=lambda item: item[1] , reverse=True))
+        self.similarity_indices = dict(sorted(self.similarity_indices.items(), key=lambda item: item[1] , reverse=True)[:10])
         # print(self.similarity_indices)
         self.show_results() 
 
@@ -138,7 +137,6 @@ class MainWindow(QtWidgets.QMainWindow, Shazam_ui.Ui_MainWindow):
             self.resultsTable.horizontalHeader().setSectionResizeMode(col, QtWidgets.QHeaderView.Stretch)
 
         self.resultsTable.show()    
-
 
     # def createPerceptualHash(self, feature):
     #     logger.debug("Creating Perceptual Hash for each feature")
