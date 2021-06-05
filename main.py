@@ -48,9 +48,9 @@ class MainWindow(QtWidgets.QMainWindow, Shazam_ui.Ui_MainWindow):
             # self.songs[index].hashed_features["chroma_stft"]=self.createPerceptualHash(np.array(self.songs[index].features["chroma_stft"]))
             # self.songs[index].hashed_features["onset_frames"]=self.createPerceptualHash(np.array(self.songs[index].features["onset_frames"]))
 
-            print(self.songs[index].features["mel_spectrogram"][0][0:30])
-            print(self.songs[index].hashed_features["mel_spectrogram"])
-            print(self.songs[index].hashed_features["mfcc"])
+            #print(self.songs[index].features["mel_spectrogram"][0][0:30])
+            #print(self.songs[index].hashed_features["mel_spectrogram"])
+            #print(self.songs[index].hashed_features["mfcc"])
 
         for song in self.songs:
             name=song_path.split("/")[-1]

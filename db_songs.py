@@ -12,10 +12,8 @@ from scipy.ndimage.morphology import (generate_binary_structure, iterate_structu
 import logging
 import imagehash
 from PIL import Image
-import difflib
-
-
-
+# import difflib
+from imagehash import hex_to_hash
 
 logger = logging.getLogger()
 
@@ -79,23 +77,39 @@ class Song():
         with io.open(PATH, 'w') as db_file:
             json.dump(dict,db_file)
 
-    # gets the similarity index between this song and another song features
+    # # gets the similarity index between this song and another song features
+    # def get_similarity_index(self, compared_features):
+    #     sim_index = []
+    #     for hash in compared_features:
+    #         sim_index.append(difflib.SequenceMatcher(None, self.hashed_features[hash], compared_features[hash]).ratio())
+    #     # avg = 0 
+    #     # sum = 0 
+    #     # for i in sim_index:
+    #     #     sum += i
+    #     # avg = sum / len(sim_index) 
+    #     sum = 1.5*sim_index[0] + 1.5*sim_index[1] +  1.5*sim_index[2] + sim_index[3]
+    #     avg = sum /5.5
+    #     return avg * 100
+
     def get_similarity_index(self, compared_features):
         sim_index = []
         for hash in compared_features:
-            sim_index.append(difflib.SequenceMatcher(None, self.hashed_features[hash], compared_features[hash]).ratio())
-        # avg = 0 
-        # sum = 0 
-        # for i in sim_index:
-        #     sum += i
-        # avg = sum / len(sim_index) 
+            hamming_distance = hex_to_hash(compared_features[hash]) - hex_to_hash(self.hashed_features[hash])
+            sim_index.append(1 - (hamming_distance / 256.0))
         sum = 1.5*sim_index[0] + 1.5*sim_index[1] +  1.5*sim_index[2] + sim_index[3]
         avg = sum /5.5
         return avg * 100
 
+
+
 if __name__ == "__main__":
-    file_hash = {}
-    for filename in os.listdir("./Database/Songs"):
+    if os.path.isfile('./Database/hash.json'):
+        file = open("./Database/hash.json",)
+        file_hash= json.load(file)
+    else:
+        file_hash = {}
+
+    for filename in os.listdir("./Database/Songs1"):
         file={}
         song_path= os.path.join(curr_dir+"/Database/Songs", filename)
         song = Song(song_path)
@@ -103,7 +117,7 @@ if __name__ == "__main__":
         song.save_spectrogram("./Database/spectrograms/")
         song.get_features()
         file.update({filename: song.features})
-        song.write_json("./Database/feautures"+filename+".json", file_hash)
+        song.write_json("./Database/features/"+filename+".json", file_hash)
         song.getHashedData(song.hashed_features, song.features)
         file_hash.update({filename: song.hashed_features})
         song.write_json("./Database/hash.json", file_hash)
